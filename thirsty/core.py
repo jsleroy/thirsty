@@ -20,6 +20,7 @@ AMENITIES = {
     "tap": "[man_made=water_tap][drinking_water=yes]",
     "spring": "[natural=spring][drinking_water=yes]",
     "fountain": "[amenity=fountain][drinking_water=yes]",
+    "bakery": "[shop=bakery]",
 }
 
 
@@ -54,10 +55,12 @@ def display_gpx_on_map(data, pois):
 
     # Plot POIs on the map
     for poi in pois:
+        poi = normalize_osm_poi(poi)
+
         folium.Marker(
             location=[poi['lat'], poi['lon']],
-            popup=folium.Popup(f"{poi['tags']['amenity']}", max_width=300),
-            icon=folium.Icon(color="blue", icon="info-sign")
+            popup=folium.Popup(poi["name"], max_width=300),
+            icon=folium.Icon(color="blue", icon=poi["icon"], prefix="fa")
         ).add_to(folium_map)
 
     return folium_map
@@ -125,15 +128,57 @@ def add_waypoints_to_gpx(gpx, pois):
     """
 
     for poi in pois:
+        poi = normalize_osm_poi(poi)
         wpt = gpxpy.gpx.GPXWaypoint()
         wpt.latitude = poi["lat"]
         wpt.longitude = poi["lon"]
-        wpt.name = "Water"
-        wpt.description = "Water"
-        wpt.symbol="water-drop"
+        wpt.name = poi["name"]
+        wpt.description = poi["type"]
+        wpt.symbol = poi["sym"]
         gpx.waypoints.append(wpt)
 
     return gpx
+
+
+def normalize_osm_poi(poi):
+    tags = poi.get("tags", {})
+
+    categories = ["amenity", "shop"]
+    category = next((k for k in categories if k in tags), None)
+    poi_type = tags.get(category) if category else None
+
+    assert(category is not None)
+    assert(poi_type is not None)
+
+    # Symbols used for HTML/Folium
+    icons = {
+        "bakery": "shopping-cart",
+        "drinking_water": "tint",
+        "supermarket": "shopping-cart",
+        "cafe": "coffee",
+        "restaurant": "cutlery",
+    }
+    icon = icons.get(poi_type, "info-sign")
+
+    # Symbols used for Garmin
+    syms = {
+        "bakery": "Food Source",
+        "drinking_water": "Drinking Water",
+        "supermarket": "Shopping Center",
+        "cafe": "Bar",
+        "restaurant": "Restaurant",
+    }
+    sym = syms.get(poi_type, "Pin")
+
+    return {
+        "lat": poi["lat"],
+        "lon": poi["lon"],
+        "category": category,
+        "type": poi_type,
+        "name": tags.get("name", poi_type),
+        "icon": icon,
+        "sym": sym,
+    }
 
 
 def haversine(lat1, lon1, lat2, lon2):
