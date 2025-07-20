@@ -64,7 +64,7 @@ def display_gpx_on_map(data, pois):
     for poi in pois:
         # Determine potability of the water to set the marker color
         potable = poi.get("tags", {}).get("drinking_water", "no") == "yes"
-        
+
         # For the popup text, we use the amenity type if available, otherwise natural spring or water tap
         amenity = poi.get("tags", {}).get("amenity", False)
         popup_text = amenity.replace("_", " ").capitalize() if amenity else ( "Natural spring" if poi.get("tags", {}).get("natural", False) else "") or ( "Water tap" if poi.get("tags", {}).get("man_made", False) else "")
