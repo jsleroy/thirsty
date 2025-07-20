@@ -21,6 +21,13 @@ AMENITIES = {
     "spring": ["[natural=spring][drinking_water=yes]"],
     "fountain": ["[amenity=fountain][drinking_water=yes]"],
     "watering_place": ["[amenity=watering_place][drinking_water=yes]"],
+    "non-potable": [
+        "[amenity=watering_place][drinking_water !~ yes]",
+        "[amenity=water_point][drinking_water !~ yes]",
+        "[man_made=water_tap][drinking_water !~ yes]",
+        "[natural=spring][drinking_water !~ yes]",
+        "[amenity=fountain][drinking_water !~ yes]"
+    ]
 }
 
 
@@ -55,6 +62,8 @@ def display_gpx_on_map(data, pois):
 
     # Plot POIs on the map
     for poi in pois:
+        # Determine potability of the water to set the marker color
+        potable = poi.get("tags", {}).get("drinking_water", "no") == "yes"
         
         # For the popup text, we use the amenity type if available, otherwise natural spring or water tap
         amenity = poi.get("tags", {}).get("amenity", False)
@@ -63,7 +72,7 @@ def display_gpx_on_map(data, pois):
         folium.Marker(
             location=[poi['lat'], poi['lon']],
             popup=folium.Popup(f"{popup_text}", max_width=300),
-            icon=folium.Icon(color= "blue", icon="water", prefix="fa")
+            icon=folium.Icon(color= potable and "blue" or "orange", icon="water", prefix="fa")
         ).add_to(folium_map)
 
     return folium_map
