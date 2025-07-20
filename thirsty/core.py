@@ -15,11 +15,12 @@ OVERPASS_URL = "http://overpass-api.de/api/interpreter"
 
 
 AMENITIES = {
-    "water": "[amenity=drinking_water]",
-    "point": "[amenity=water_point][drinking_water=yes]",
-    "tap": "[man_made=water_tap][drinking_water=yes]",
-    "spring": "[natural=spring][drinking_water=yes]",
-    "fountain": "[amenity=fountain][drinking_water=yes]",
+    "water": ["[amenity=drinking_water]"],
+    "point": ["[amenity=water_point][drinking_water=yes]"],
+    "tap": ["[man_made=water_tap][drinking_water=yes]"],
+    "spring": ["[natural=spring][drinking_water=yes]"],
+    "fountain": ["[amenity=fountain][drinking_water=yes]"],
+    "watering_place": ["[amenity=watering_place][drinking_water=yes]"],
 }
 
 
@@ -54,10 +55,15 @@ def display_gpx_on_map(data, pois):
 
     # Plot POIs on the map
     for poi in pois:
+        
+        # For the popup text, we use the amenity type if available, otherwise natural spring or water tap
+        amenity = poi.get("tags", {}).get("amenity", False)
+        popup_text = amenity.replace("_", " ").capitalize() if amenity else ( "Natural spring" if poi.get("tags", {}).get("natural", False) else "") or ( "Water tap" if poi.get("tags", {}).get("man_made", False) else "")
+
         folium.Marker(
             location=[poi['lat'], poi['lon']],
-            popup=folium.Popup(f"{poi['tags']['amenity']}", max_width=300),
-            icon=folium.Icon(color="blue", icon="info-sign")
+            popup=folium.Popup(f"{popup_text}", max_width=300),
+            icon=folium.Icon(color= "blue", icon="water", prefix="fa")
         ).add_to(folium_map)
 
     return folium_map
@@ -109,10 +115,11 @@ def query_overpass(bbox, poi_types):
 
     query_parts = []
     for poi_type in poi_types:
-        tag_filter = AMENITIES[poi_type]
+        tag_filters = AMENITIES[poi_type]
         # for osm_type in ["node", "way", "relation"]:
         #     query_parts.append(f'{osm_type}{tag_filter}{bbox_str};')
-        query_parts.append(f'node{tag_filter}{bbox_str};')
+        for tag_filter in tag_filters:
+            query_parts.append(f'node{tag_filter}{bbox_str};')
 
     query = "[out:json][timeout:25];(" + "".join(query_parts) + ");out center;"
     response = requests.post(OVERPASS_URL, data=query)
