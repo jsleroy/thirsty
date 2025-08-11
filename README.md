@@ -57,13 +57,15 @@ You can customize which types of potable water points you want to add using the 
 
 ### Available POI types
 
-| POI Type        | Description                                                            |
-|:----------------|:-----------------------------------------------------------------------|
-| `drinking_water` | Public drinking water fountains (default).                            |
-| `water_point`    | Water refill stations for caravans, RVs, or marinas (only potable ones). |
-| `water_tap`      | Taps providing potable water.                                          |
-| `spring`         | Natural springs with potable water.                                   |
-| `fountain`       | Public decorative fountains explicitly marked as potable.             |
+| POI Type          | Description                                                              |
+| :---------------- | :----------------------------------------------------------------------- |
+| `drinking_water`  | Public drinking water fountains (default).                               |
+| `water_point`     | Water refill stations for caravans, RVs, or marinas (only potable ones). |
+| `water_tap`       | Taps providing potable water.                                            |
+| `spring`          | Natural springs with potable water.                                      |
+| `fountain`        | Public decorative fountains explicitly marked as potable.                |
+| `watering_places` | Watering places indented for animals explicitly marked as potable.       |
+| `non-potable`     | All water sources that are not explicitly marked as potable.             |
 
 ### Example usage
 
