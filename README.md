@@ -1,5 +1,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/jsleroy/thirsty.svg?style=social)](https://github.com/jsleroy/thirsty/stargazers)
 
+This project has been archived, as a way more user-friendly online tool exists now: https://pitstopper.net/
+
 <p align="center">
 <img src="docs/assets/logo.png" alt="Thirsty Logo" width="200"/>
 </p>
